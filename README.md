@@ -68,6 +68,8 @@ When creating a content item, the content type picker is automatically filtered 
 
 Each folder can have one scope. **Apply to child folders** is off by default, including for existing scopes after upgrading. When enabled, the scope also applies to all descendants, including folders created later. A folder without its own scope still receives any applicable ancestor scopes; if none apply, it uses the workspace restrictions alone.
 
+The database enforces one scope per workspace/folder, including when users save concurrently. If an older preview contains duplicate scopes, reconcile them before upgrading; installation does not automatically delete or merge conflicting rules.
+
 To edit an existing scope, open it from the listing. It opens on **Settings**, the first item in the scope navigation, followed by **Allowed content types** and **Excluded content types**. Change **Folder** to another folder in the same workspace or toggle **Apply to child folders**, then save. Changing the folder preserves the scope's allowed and excluded content type selections. A folder that already has another scope cannot be selected as the destination.
 
 The workspace rules, every applicable ancestor scope, and the folder's own scope are combined. A content type must be permitted by all of them. Within each scope, a non-empty allow list takes precedence over that scope's exclude list. Empty lists add no restrictions. A child scope cannot restore a type blocked by an ancestor, and leaving its **Apply to child folders** setting off does not stop inheritance from higher ancestors. For example, if a workspace allows **Article**, **Image**, and **Video**, a parent scope can exclude **Video** for its whole subtree, and a child scope can narrow the choices further to **Image**.

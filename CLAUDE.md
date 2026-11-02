@@ -18,7 +18,14 @@ dotnet pack --configuration Release
 dotnet test --configuration Release
 ```
 
-The xUnit project under `tests` covers restriction precedence, ancestor scope resolution, and content type picker behavior using in-memory data. CI requires these tests to pass. CMS page rendering, form submissions, and schema upgrades still require a CMS smoke test.
+The xUnit project under `tests` covers restriction precedence, ancestor scope resolution, content type picker behavior, GUID metadata, and duplicate-key error handling using in-memory data. CI requires these tests to pass. CMS page rendering, form submissions, and complete schema upgrades still require a CMS smoke test.
+
+Optional SQL Server integration tests execute the installer's Kentico-generated index DDL and exercise concurrent creates/reassignments. Set `WORKSPACE_RESTRICTIONS_TEST_CONNECTION_STRING` before running `dotnet test` to enable them. Use a test database where the account can create and drop tables; each test creates a uniquely named table and drops it afterward. For local development in PowerShell:
+
+```powershell
+$env:WORKSPACE_RESTRICTIONS_TEST_CONNECTION_STRING = 'Server=(localdb)\MSSQLLocalDB;Database=tempdb;Integrated Security=true;TrustServerCertificate=true'
+dotnet test --configuration Release
+```
 
 ## Architecture
 
@@ -48,6 +55,8 @@ The library adds "Allowed content types", "Excluded content types", and "Folder 
 - `FolderScopeContentTypeAllowedInfo` and `FolderScopeContentTypeExcludedInfo`: scope-to-content-type bindings (ID, FolderScopeID, ClassID).
 
 All are installed programmatically by `WorkspaceRestrictionsInstaller` — no migration files or CI/CD schema steps required. The installer is idempotent (checks `HasChanged` before saving).
+
+The folder scope table also has a unique workspace/folder index, ensured on each installation even when the class definition has not changed. Both save pages translate conflicts with that index into a duplicate-folder validation message. Existing duplicate scopes must be reconciled before adding the index; installation never discards their bindings automatically.
 
 **Filtering logic** (in `ContentTypeRestriction`, `FolderScopeResolver`, and `WorkspaceContentTypeFilterExtender`): allow lists take precedence over exclude lists independently within each scope. A scope always applies to its selected folder and, when ApplyToChildFolders is enabled, all descendants. The resolver follows ContentFolderParentFolderID within the workspace. The effective set is the intersection of workspace rules, every applicable ancestor scope, and the direct folder scope. Child scopes cannot restore types blocked by an ancestor or the workspace. Empty scope lists add no restrictions. Smart folders do not match ordinary content folder IDs.
 

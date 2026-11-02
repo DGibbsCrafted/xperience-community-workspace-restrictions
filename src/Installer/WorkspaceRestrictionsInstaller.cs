@@ -142,7 +142,18 @@ internal class WorkspaceRestrictionsInstaller(IInfoProvider<ResourceInfo> resour
         });
 
         InstallClass(resource, WorkspaceFolderScopeInfo.TYPEINFO, "Workspace Folder Scope", formInfo);
+        InstallFolderScopeIndex(DataConnectionFactory.TableManagerObject);
     }
+
+    internal static void InstallFolderScopeIndex(ITableManager tableManager) => tableManager.CreateIndex(
+        WorkspaceFolderScopePersistence.UniqueFolderIndexName,
+        WorkspaceFolderScopeInfo.TYPEINFO.ObjectClassName.Replace(".", "_"),
+        isUnique: true,
+        columns:
+        [
+            (nameof(WorkspaceFolderScopeInfo.WorkspaceFolderScopeWorkspaceID), true),
+            (nameof(WorkspaceFolderScopeInfo.WorkspaceFolderScopeFolderID), true),
+        ]);
 
     private static void InstallFolderScopeContentTypeClass(ResourceInfo resource, ObjectTypeInfo typeInfo,
         string displayName, string idColumn, string scopeColumn, string classColumn)

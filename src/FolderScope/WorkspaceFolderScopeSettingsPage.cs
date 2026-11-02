@@ -81,12 +81,20 @@ public class WorkspaceFolderScopeSettingsPage(
         if (existingScope != null)
         {
             return ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure))
-                .AddErrorMessage("A scope already exists for this folder. Edit the existing scope instead.");
+                .AddErrorMessage(WorkspaceFolderScopePersistence.DuplicateFolderMessage);
         }
 
         scope.WorkspaceFolderScopeFolderID = model.FolderId;
         scope.WorkspaceFolderScopeApplyToChildFolders = model.ApplyToChildFolders;
-        scopeProvider.Set(scope);
+        try
+        {
+            scopeProvider.Set(scope);
+        }
+        catch (Exception exception) when (WorkspaceFolderScopePersistence.IsDuplicateFolder(exception))
+        {
+            return ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure))
+                .AddErrorMessage(WorkspaceFolderScopePersistence.DuplicateFolderMessage);
+        }
         return await base.ProcessFormData(model, formItems);
     }
 

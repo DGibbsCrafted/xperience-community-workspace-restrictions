@@ -21,10 +21,13 @@ public class WorkspaceFolderScopeInfo : AbstractInfo<WorkspaceFolderScopeInfo, I
         OBJECT_TYPE,
         "XperienceCommunity.WorkspaceFolderScope",
         nameof(WorkspaceFolderScopeID),
-        null, null, null, null,
-        nameof(WorkspaceFolderScopeGUID),
-        nameof(WorkspaceFolderScopeWorkspaceID),
-        WorkspaceInfo.OBJECT_TYPE)
+        timeStampColumn: null,
+        guidColumn: nameof(WorkspaceFolderScopeGUID),
+        codeNameColumn: null,
+        displayNameColumn: null,
+        binaryColumn: null,
+        parentIDColumn: nameof(WorkspaceFolderScopeWorkspaceID),
+        parentObjectType: WorkspaceInfo.OBJECT_TYPE)
     {
         TouchCacheDependencies = true,
         DependsOn = new List<ObjectDependency>

@@ -60,7 +60,7 @@ public class WorkspaceFolderScopeCreatePage(
         if (existingScope != null)
         {
             return ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure))
-                .AddErrorMessage("A scope already exists for this folder. Edit the existing scope instead.");
+                .AddErrorMessage(WorkspaceFolderScopePersistence.DuplicateFolderMessage);
         }
 
         var scope = new WorkspaceFolderScopeInfo
@@ -70,7 +70,15 @@ public class WorkspaceFolderScopeCreatePage(
             WorkspaceFolderScopeFolderID = model.FolderId,
             WorkspaceFolderScopeApplyToChildFolders = model.ApplyToChildFolders,
         };
-        scopeProvider.Set(scope);
+        try
+        {
+            scopeProvider.Set(scope);
+        }
+        catch (Exception exception) when (WorkspaceFolderScopePersistence.IsDuplicateFolder(exception))
+        {
+            return ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure))
+                .AddErrorMessage(WorkspaceFolderScopePersistence.DuplicateFolderMessage);
+        }
 
         return NavigateTo(pageLinkGenerator.GetPath<FolderScopeContentTypeAllowedPage>(new PageParameterValues
         {

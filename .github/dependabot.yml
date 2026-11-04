@@ -10,3 +10,12 @@ updates:
     ignore:
       - dependency-name: "Kentico.Xperience.*"
     open-pull-requests-limit: 5
+
+  # Maintain GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "07:00"
+    open-pull-requests-limit: 5

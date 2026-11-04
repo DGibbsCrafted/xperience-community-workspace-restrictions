@@ -62,4 +62,16 @@ The folder scope table also has a unique workspace/folder index, ensured on each
 
 ### Package versioning
 
-Package versions are managed centrally in `Directory.Packages.props`. The `Kentico.Xperience.Admin` package version determines the minimum compatible XbK version (currently `31.2.1`). When bumping the XbK dependency, update `Directory.Packages.props` and the compatibility table in `README.md`.
+Package versions are managed centrally in `Directory.Packages.props`. The `Kentico.Xperience.Admin` package version determines the minimum compatible XbK version (currently `31.9.3`). When bumping the XbK dependency, update `Directory.Packages.props`, the compatibility table in `README.md`, and the database manager version in `examples/DancingGoat/.config/dotnet-tools.json`.
+
+## Example site
+
+`examples/DancingGoat` is a Dancing Goat sample site generated from the Xperience by Kentico 31.9.3 template. It references the library project and is the place to test admin UI changes by hand. It has its own `DancingGoat.sln` and is not part of the root solution, so CI doesn't build it, and CodeQL skips `examples/**`. The connection string points at a LocalDB database named `WorkspaceRestrictions-DancingGoat`. See `README.md` for how to create it.
+
+```powershell
+# Build the example site
+dotnet build examples/DancingGoat/DancingGoat.csproj
+
+# Run the example site (http://localhost:46629/admin)
+dotnet run --project examples/DancingGoat/DancingGoat.csproj
+```
